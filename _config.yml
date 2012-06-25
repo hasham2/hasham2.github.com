@@ -10,7 +10,7 @@ pygments: true
 # so be sure to set them if your theme uses them.
 #
 title : Programmatic M
-tagline: My thoughts and explorations on Ruby and Rails
+tagline: My thoughts on OSS web development
 author :
   name : Hasham Malik
   email : hasham2@gmail.com
