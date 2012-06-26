@@ -1,0 +1,17 @@
+<p>It is extremely annoying to scroll through pages and pages of output on command line of asset pipeline related stuff to find useful stuff. Thanks to a colleague <a href='http://sohaibbbhatti.wordpress.com/'>Sohaib Bhatti</a> here is a protip to hide asset pipeline related noise from appering in logs.</p>
+
+<pre><code>if Rails.env.development?
+ Rails.application.assets.logger = Logger.new(&#39;/dev/null&#39;)
+  Rails::Rack::Logger.class_eval do
+    def call_with_quiet_assets(env)
+      previous_level = Rails.logger.level
+      Rails.logger.level = Logger::ERROR if env[&#39;PATH_INFO&#39;] =~ %r{^/assets/}
+      call_without_quiet_assets(env)
+    ensure
+      Rails.logger.level = previous_level
+    end
+    alias_method_chain :call, :quiet_assets
+  end
+end</code></pre>
+
+<p>Thats it!</p>

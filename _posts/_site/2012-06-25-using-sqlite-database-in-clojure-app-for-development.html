@@ -1,0 +1,47 @@
+<p>Liquid error: No such file or directory - /home/hasham/apps/hasham2.github.com/_posts/_includes SQLite is light weight embedded relational database that you can easily use in your clojure/compojure projects during development. Once you have tested your application in local enviorment you can choose to move to any other SQL compliant databases (ie MySQL, PostgreSQL)</p>
+
+<p>Assuming that you have generated your project with Lein (which is awesome build tool for clojure developers) there would be <code>project.clj</code> file in root directory of your app. Add reference to SQLite and JDBC driver in dependencies. Your project file would look something like this with SQLite drivers added:</p>
+
+<pre><code>(defproject myapp &quot;0.0.1&quot;
+  :description &quot;my app&quot;
+  :dependencies [[org.clojure/clojure &quot;1.3.0&quot;]
+                 [org.clojure/java.clojurejdbc &quot;0.0.6&quot;]
+                 [org.xerial/sqlite-jdbc &quot;3.6.13&quot;] 
+                 [ring/ring-jetty-adapter &quot;1.0.1&quot;]
+                 [compojure &quot;0.6.4&quot;]
+                 [hiccup &quot;0.3.6&quot;]])</code></pre>
+
+<p>After this you would want to create a migration so that you can create database file and a tables in database. SQLite databases are stored on your file system. Here are setting you would use for SQLite in your <code>migration.clj</code> file:</p>
+
+<pre><code>(def db {
+    :classname &quot;org.sqlite.JDBC&quot;
+    :subprotocol &quot;sqlite&quot;
+    :subname &quot;db/database.db&quot;})</code></pre>
+
+<p>Your migration file should look something like this:</p>
+
+<pre><code>(ns shouter.models.migration
+    (:require [clojure.java.jdbc :as sql]))
+
+(def db {
+      :classname &quot;org.sqlite.JDBC&quot;
+      :subprotocol &quot;sqlite&quot;
+      :subname &quot;db/database.db&quot;})
+
+(defn create-posts [] 
+      (try (sql/with-connection db
+        (sql/create-table :posts
+          [:id :serial &quot;PRIMARY KEY&quot;]
+          [:title :varchar &quot;NOT NULL&quot;]
+          [:body :varchar &quot;NOT NULL&quot;]
+          [:created_at :timestamp &quot;NOT NULL&quot; &quot;DEFAULT CURRENT_TIMESTAMP&quot;]))
+      (catch Exception e (println e)))
+)
+
+(defn -main []
+      (print &quot;Migrating database ... &quot;) (flush)
+      (create-posts)
+      (println &quot;Done ...&quot;)
+)</code></pre>
+
+<p>Thats it!</p>
